@@ -280,6 +280,17 @@ var InputMask = (function () {
 
     var onKeyDown = function(element, options, event) {
         var keyCode = event.which;
+
+        var copyCutPasteKeys = [keys.v, keys.c, keys.x].indexOf(keyCode) > -1 && event.ctrlKey;
+
+        var movementKeys = [keys.left, keys.right, keys.tab].indexOf(keyCode) > -1;
+
+        var modifierKeys = event.ctrlKey || event.shiftKey;
+
+        if (copyCutPasteKeys || movementKeys || modifierKeys) {
+
+            return true;
+        }
         
         if (element.selectionStart === 0 && element.selectionEnd === element.value.length) {
             element.value = "";
@@ -301,17 +312,6 @@ var InputMask = (function () {
             event.preventDefault();
 
             return false;
-        }
-
-        var copyCutPasteKeys = [keys.v, keys.c, keys.x].indexOf(keyCode) > -1 && event.ctrlKey;
-
-        var movementKeys = [keys.left, keys.right, keys.tab].indexOf(keyCode) > -1;
-
-        var modifierKeys = event.ctrlKey || event.shiftKey;
-
-        if (copyCutPasteKeys || movementKeys || modifierKeys) {
-            
-            return true;
         }
 
         if (element.value.length === options.mask.length) {
