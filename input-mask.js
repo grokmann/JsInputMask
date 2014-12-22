@@ -460,14 +460,14 @@
     };
 });
 
-window.onload = function() {
-    new InputMask().Initialize(document.querySelectorAll("[data-mask]"), {
-        mask: this.DefaultMasks.Ssn, //select a default mask or supply a custom mask string
-        forceUpper: false, //forces alpha chars to upper
-        forceLower: false, //forces alpha chars to lower
-        //validateDataType: true, //only usable on date/time/datetime - validates the value entered 
-        //useEnterKey: true, //only usable on date/time/datetime - auto fills in current date/time/datetime when enter is pressed
-        //dataType: this.DataType.Time, //only usable on date/time/datetime - must be supplied if validatedatatype is true
-        placeHolder: "SSN: 999-99-9999" //optional, omit this if your element already has a placeholder defined
-    });
-};
+//window.onload = function() {
+//    new InputMask().Initialize(document.querySelectorAll("[data-mask]"), {
+//        mask: this.DefaultMasks.Ssn, //select a default mask or supply a custom mask string
+//        forceUpper: false, //forces alpha chars to upper
+//        forceLower: false, //forces alpha chars to lower
+//        //validateDataType: true, //only usable on date/time/datetime - validates the value entered 
+//        //useEnterKey: true, //only usable on date/time/datetime - auto fills in current date/time/datetime when enter is pressed
+//        //dataType: this.DataType.Time, //only usable on date/time/datetime - must be supplied if validatedatatype is true
+//        placeHolder: "SSN: 999-99-9999" //optional, omit this if your element already has a placeholder defined
+//    });
+//};
