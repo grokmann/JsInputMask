@@ -303,7 +303,13 @@ var InputMask = (function () {
             return false;
         }
 
-        if (([keys.v, keys.c, keys.x].indexOf(keyCode) > -1 && event.ctrlKey) || event.ctrlKey) {
+        var copyCutPasteKeys = [keys.v, keys.c, keys.x].indexOf(keyCode) > -1 && event.ctrlKey;
+
+        var movementKeys = [keys.left, keys.right, keys.tab].indexOf(keyCode) > -1;
+
+        var modifierKeys = event.ctrlKey || event.shiftKey;
+
+        if (copyCutPasteKeys || movementKeys || modifierKeys) {
             
             return true;
         }
@@ -317,8 +323,8 @@ var InputMask = (function () {
         if (options.dataType && options.useEnterKey && keyCode === keys.enter) {
             if (options.dataType >= 1 && options.dataType <= 5) {
                 var now = new Date();
-                var day = now.getDay().toString().length === 1 ? "0" + now.getDay() : now.getDay();
-                var month = now.getMonth().toString().length === 1 ? "0" + now.getMonth() : now.getMonth();
+                var day = now.getDate().toString().length === 1 ? "0" + now.getDate() : now.getDate();
+                var month = (now.getMonth() + 1).toString().length === 1 ? "0" + (now.getMonth() + 1) : (now.getMonth() + 1);
                 var year = now.getFullYear();
                 var hours = now.getHours().toString().length === 1 ? "0" + now.getHours() : now.getHours();
                 var minutes = now.getMinutes().toString().length === 1 ? "0" + now.getMinutes() : now.getMinutes();
