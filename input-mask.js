@@ -1,4 +1,26 @@
-﻿var InputMask = (function() {
+﻿var InputMaskDefaultMask = new (function() {
+    return {
+        Date: "99/99/9999",
+        DateTime: "99/99/9999 99:99:99",
+        DateTimeShort: "99/99/9999 99:99",
+        Time: "99:99:99",
+        TimeShort: "99:99",
+        Ssn: "999-99-9999",
+        Phone: "(999) 999-9999"
+    };
+});
+
+var InputMaskDataType = new (function() {
+    return {
+        Date: 1,
+        DateTime: 2,
+        DateTimeShort: 3,
+        Time: 4,
+        TimeShort: 5
+    };
+});
+
+var InputMask = (function () {
     "use strict";
 
     var formatCharacters = ["-", "_", "(", ")", "[", "]", ":", ".", ",", "$", "%", "@", " ", "/"];
@@ -400,22 +422,6 @@
     };
 
     return {
-        DataType: {
-            Date: 1,
-            DateTime: 2,
-            DateTimeShort: 3,
-            Time: 4,
-            TimeShort: 5
-        },
-        DefaultMasks: {
-            Date: "99/99/9999",
-            DateTime: "99/99/9999 99:99:99",
-            DateTimeShort: "99/99/9999 99:99",
-            Time: "99:99:99",
-            TimeShort: "99:99",
-            Ssn: "999-99-9999",
-            Phone: "(999) 999-9999"
-        },
         Initialize: function(elements, options) {
             if (!elements || !options || !options.mask || options.mask.length <= 0) {
                 return;
