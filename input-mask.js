@@ -29,6 +29,8 @@ var InputMask = (function() {
 
     var mask = null;
 
+    var hasMask = false;
+
     var forceUpper = false;
 
     var forceLower = false;
@@ -369,7 +371,9 @@ var InputMask = (function() {
             return false;
         }
 
-        checkAndInsertMaskCharacters(element, getCursorPosition(element));
+        if (hasMask) {
+            checkAndInsertMaskCharacters(element, getCursorPosition(element));
+        }
 
         if (isValidCharacter(keyCode, mask[getCursorPosition(element)])) {
             if (keyCode >= keys.numberPadZero && keyCode <= keys.numberPadNine) {
@@ -390,7 +394,9 @@ var InputMask = (function() {
 
             insertCharacterAtIndex(element, getCursorPosition(element), character);
 
-            checkAndInsertMaskCharacters(element, getCursorPosition(element));
+            if (hasMask) {
+                checkAndInsertMaskCharacters(element, getCursorPosition(element));
+            }
         }
 
         event.preventDefault();
@@ -452,8 +458,9 @@ var InputMask = (function() {
                 return;
             }
 
-            if (options.mask) {
+            if (options.mask && options.mask.length > 0) {
                 mask = options.mask.split("");
+                hasMask = true;
             }
 
             if (options.forceUpper) {
@@ -478,7 +485,7 @@ var InputMask = (function() {
 
             [].forEach.call(elements, function(element) {
                 element.onblur = function() {
-                    if (!element.getAttribute("readonly")) {
+                    if (!element.getAttribute("readonly") && hasMask) {
                         return onLostFocus(element);
                     }
 
@@ -505,7 +512,7 @@ var InputMask = (function() {
                     element.setAttribute("placeholder", options.placeHolder);
                 }
 
-                if (element.value.length > 0 && mask && mask.length > 0) {
+                if (element.value.length > 0 && hasMask) {
                     formatWithMask(element);
                 }
             });
