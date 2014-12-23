@@ -27,6 +27,8 @@ var InputMask = (function() {
 
     var maskCharacters = ["A", "9", "*"];
 
+    var originalValue = "";
+
     var mask = null;
 
     var hasMask = false;
@@ -59,9 +61,74 @@ var InputMask = (function() {
         shift: 16,
         enter: 13,
         control: 17,
+        escape: 27,
         v: 86,
         c: 67,
         x: 88
+    };
+
+    var between = function(x, a, b) {
+        return x && a && b && x >= a && x <= b;
+    };
+
+    var parseDate = function(value) {
+        var date;
+
+        if (value) {
+            if (between(dataType, 1, 3)) {
+                date = new Date(value);
+            } else {
+                date = new Date();
+
+                var timeSegments = value.split(":");
+
+                var utcHours = timeSegments.length > 0 ? timeSegments[0] : 0;
+                var utcMinutes = timeSegments.length > 1 ? timeSegments[1] : 0;
+                var utcSeconds = timeSegments.length > 2 ? timeSegments[2] : 0;
+
+                date.setUTCHours(utcHours, utcMinutes, utcSeconds);
+            }
+        }
+
+        if (!value || date == null || isNaN(date.getTime())) {
+            var now = new Date();
+
+            date = new Date(Date.UTC(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate(),
+                now.getHours(),
+                now.getMinutes()
+            ));
+        }
+
+        return date;
+    };
+
+    var getFormattedDateTime = function(value) {
+        var date = parseDate(value);
+
+        var day = date.getUTCDate() < 10 ? "0" + date.getUTCDate() : date.getUTCDate();
+        var month = (date.getUTCMonth() + 1) < 10 ? "0" + (date.getUTCMonth() + 1) : (date.getUTCMonth() + 1);
+        var year = date.getUTCFullYear();
+        var hours = date.getUTCHours() < 10 ? "0" + date.getUTCHours() : date.getUTCHours();
+        var minutes = date.getUTCMinutes() < 10 ? "0" + date.getUTCMinutes() : date.getUTCMinutes();
+        var seconds = date.getUTCSeconds() < 10 ? "0" + date.getUTCSeconds() : date.getUTCSeconds();
+
+        switch (dataType) {
+        case 1:
+            return month + "/" + day + "/" + year;
+        case 2:
+            return month + "/" + day + "/" + year + " " + hours + ":" + minutes + ":" + seconds;
+        case 3:
+            return month + "/" + day + "/" + year + " " + hours + ":" + minutes;
+        case 4:
+            return hours + ":" + minutes + ":" + seconds;
+        case 5:
+            return hours + ":" + minutes;
+        default:
+            return "";
+        }
     };
 
     var getCursorPosition = function(element) {
@@ -80,10 +147,6 @@ var InputMask = (function() {
         }
 
         return position;
-    };
-
-    var between = function(x, a, b) {
-        return x && a && b && x >= a && x <= b;
     };
 
     var isValidCharacter = function(keyCode, maskCharacter) {
@@ -193,60 +256,26 @@ var InputMask = (function() {
         }
     };
 
-    var validateDataEqualsDataType = function(element, dataType) {
+    var validateDataEqualsDataType = function(element) {
         if (element == null || element.value === "") {
             return;
         }
 
-        if (between(dataType, 1, 5)) {
-            var date;
+        var date = parseDate(element.value);
 
-            if (between(dataType, 1, 3)) {
-                date = new Date(element.value);
-            } else {
-                date = new Date();
+        if (between(dataType, 1, 3)) {
+            if (isNaN(date.getDate()) || date.getFullYear() <= 1000) {
+                element.value = "";
 
-                var timeSegments = element.value.split(":");
-
-                for (var i = 0; i < timeSegments.length; i++) {
-                    if (timeSegments[i] > 60) {
-                        element.value = "";
-
-                        return;
-                    }
-                }
-
-                var milliseconds = 0;
-
-                if (timeSegments[0]) {
-                    milliseconds = timeSegments[0] * 3600000;
-                }
-
-                if (timeSegments[1]) {
-                    milliseconds += timeSegments[1] * 60000;
-                }
-
-                if (timeSegments[2]) {
-                    milliseconds += timeSegments[1] * 1000;
-                }
-
-                date.setTime(milliseconds);
+                return;
             }
+        }
 
-            if (between(dataType, 1, 3)) {
-                if (isNaN(date.getDate()) || date.getFullYear() <= 1000) {
-                    element.value = "";
+        if (dataType > 1) {
+            if (isNaN(date.getTime())) {
+                element.value = "";
 
-                    return;
-                }
-            }
-
-            if (dataType > 1) {
-                if (isNaN(date.getTime())) {
-                    element.value = "";
-
-                    return;
-                }
+                return;
             }
         }
     }
@@ -289,42 +318,17 @@ var InputMask = (function() {
             }
 
             if (validateDataType && dataType) {
-                validateDataEqualsDataType(element, dataType);
+                validateDataEqualsDataType(element);
             }
         }
     };
 
-    var getFormattedDateTime = function(date) {
-        var dateToParse = date || new Date();
-        var day = dateToParse.getDate().toString().length === 1 ? "0" + dateToParse.getDate() : dateToParse.getDate();
-        var month = (dateToParse.getMonth() + 1).toString().length === 1 ? "0" + (dateToParse.getMonth() + 1) : (dateToParse.getMonth() + 1);
-        var year = dateToParse.getFullYear();
-        var hours = dateToParse.getHours().toString().length === 1 ? "0" + dateToParse.getHours() : dateToParse.getHours();
-        var minutes = dateToParse.getMinutes().toString().length === 1 ? "0" + dateToParse.getMinutes() : dateToParse.getMinutes();
-        var seconds = dateToParse.getSeconds().toString().length === 1 ? "0" + dateToParse.getSeconds() : dateToParse.getSeconds();
-
-        switch (dataType) {
-        case 1:
-            return month + "/" + day + "/" + year;
-        case 2:
-            return month + "/" + day + "/" + year + " " + hours + ":" + minutes + ":" + seconds;
-        case 3:
-            return month + "/" + day + "/" + year + " " + hours + ":" + minutes;
-        case 4:
-            return hours + ":" + minutes + ":" + seconds;
-        case 5:
-            return hours + ":" + minutes;
-        default:
-            return "";
-        }
-    };
-
     var onKeyDown = function(element, event) {
-        var keyCode = event.which;
+        var key = event.which;
 
-        var copyCutPasteKeys = [keys.v, keys.c, keys.x].indexOf(keyCode) > -1 && event.ctrlKey;
+        var copyCutPasteKeys = [keys.v, keys.c, keys.x].indexOf(key) > -1 && event.ctrlKey;
 
-        var movementKeys = [keys.left, keys.right, keys.tab].indexOf(keyCode) > -1;
+        var movementKeys = [keys.left, keys.right, keys.tab].indexOf(key) > -1;
 
         var modifierKeys = event.ctrlKey || event.shiftKey;
 
@@ -334,18 +338,28 @@ var InputMask = (function() {
         }
 
         if (element.selectionStart === 0 && element.selectionEnd === element.value.length) {
+            originalValue = element.value;
+
             element.value = "";
         }
 
-        if (keyCode === keys.backSpace || keyCode === keys.delete) {
-            if (keyCode === keys.backSpace) {
-                checkAndRemoveMaskCharacters(element, getCursorPosition(element) - 1, keyCode);
+        if (key === keys.escape) {
+            if (originalValue !== "") {
+                element.value = originalValue;
+            }
+
+            return true;
+        }
+
+        if (key === keys.backSpace || key === keys.delete) {
+            if (key === keys.backSpace) {
+                checkAndRemoveMaskCharacters(element, getCursorPosition(element) - 1, key);
 
                 removeCharacterAtIndex(element, getCursorPosition(element) - 1);
             }
 
-            if (keyCode === keys.delete) {
-                checkAndRemoveMaskCharacters(element, getCursorPosition(element), keyCode);
+            if (key === keys.delete) {
+                checkAndRemoveMaskCharacters(element, getCursorPosition(element), key);
 
                 removeCharacterAtIndex(element, getCursorPosition(element));
             }
@@ -355,7 +369,7 @@ var InputMask = (function() {
             return false;
         }
 
-        if (dataType && useEnterKey && keyCode === keys.enter) {
+        if (dataType && useEnterKey && key === keys.enter) {
             if (dataType >= 1 && dataType <= 5) {
                 element.value = getFormattedDateTime();
             }
@@ -375,14 +389,14 @@ var InputMask = (function() {
             checkAndInsertMaskCharacters(element, getCursorPosition(element));
         }
 
-        if (isValidCharacter(keyCode, mask[getCursorPosition(element)])) {
-            if (keyCode >= keys.numberPadZero && keyCode <= keys.numberPadNine) {
-                keyCode = keyCode - 48;
+        if (isValidCharacter(key, mask[getCursorPosition(element)])) {
+            if (key >= keys.numberPadZero && key <= keys.numberPadNine) {
+                key = key - 48;
             }
 
             var character = event.shiftKey
-                ? String.fromCharCode(keyCode).toUpperCase()
-                : String.fromCharCode(keyCode).toLowerCase();
+                ? String.fromCharCode(key).toUpperCase()
+                : String.fromCharCode(key).toLowerCase();
 
             if (forceUpper) {
                 character = character.toUpperCase();
@@ -416,10 +430,12 @@ var InputMask = (function() {
         }
 
         if (pastedText != null && pastedText !== "") {
-            var pastedCharacters = pastedText.replace(" ", "").split("");
+            for (var j = 0; j < formatCharacters.length; j++) {
+                pastedText.replace(formatCharacters[j], "");
+            }
 
-            for (var i = 0; i < pastedCharacters.length; i++) {
-                if (formatCharacters.indexOf(pastedCharacters[i]) > -1) {
+            for (var i = 0; i < pastedText.length; i++) {
+                if (formatCharacters.indexOf(pastedText[i]) > -1) {
                     continue;
                 }
 
@@ -429,7 +445,7 @@ var InputMask = (function() {
                     keyDownEvent.initEvent("keydown", true, true);
                 }
 
-                keyDownEvent.keyCode = keyDownEvent.which = pastedCharacters[i].charCodeAt(0);
+                keyDownEvent.keyCode = keyDownEvent.which = pastedText[i].charCodeAt(0);
 
                 element.dispatchEvent ? element.dispatchEvent(keyDownEvent) : element.fireEvent("onkeydown", keyDownEvent);
             }
@@ -442,7 +458,7 @@ var InputMask = (function() {
         var value = element.value;
 
         if (between(dataType, 1, 5)) {
-            value = getFormattedDateTime(new Date(element.value));
+            value = getFormattedDateTime(element.value);
         }
 
         element.value = "";
