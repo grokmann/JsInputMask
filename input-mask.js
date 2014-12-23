@@ -72,14 +72,32 @@ var InputMask = (function() {
     };
 
     var parseDate = function(value) {
-        var date;
+        var now = new Date();
+
+        var date = new Date(Date.UTC(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate(),
+            now.getHours(),
+            now.getMinutes(),
+            now.getSeconds()
+        ));
 
         if (value) {
             if (between(dataType, 1, 3)) {
-                date = new Date(value);
-            } else {
-                date = new Date();
+                var tempDate = new Date(value);
 
+                if (!isNaN(tempDate.getTime())) {
+                    date = new Date(Date.UTC(
+                        tempDate.getFullYear(),
+                        tempDate.getMonth(),
+                        tempDate.getDate(),
+                        tempDate.getHours(),
+                        tempDate.getMinutes(),
+                        tempDate.getSeconds()
+                    ));
+                }
+            } else {
                 var timeSegments = value.split(":");
 
                 var utcHours = timeSegments.length > 0 ? timeSegments[0] : 0;
@@ -89,19 +107,7 @@ var InputMask = (function() {
                 date.setUTCHours(utcHours, utcMinutes, utcSeconds);
             }
         }
-
-        if (!value || date == null || isNaN(date.getTime())) {
-            var now = new Date();
-
-            date = new Date(Date.UTC(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate(),
-                now.getHours(),
-                now.getMinutes()
-            ));
-        }
-
+        
         return date;
     };
 
