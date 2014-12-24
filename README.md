@@ -5,4 +5,4 @@ Pure Javascript based input mask
 
 
 
-Please see WIKI Pages for instructions
+Please see Wiki Page(s) for instructions
