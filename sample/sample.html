@@ -11,16 +11,40 @@
 				mask: InputMaskDefaultMask.Ssn, 
 				placeHolder: "SSN: 999-99-9999" 
 			});
+			
+			new InputMask().Initialize(document.querySelectorAll("#sample-date"),
+			{
+				mask: InputMaskDefaultMask.Date, 
+				placeHolder: "Date: 01/01/2015" 
+			});			
+			
+			new InputMask().Initialize(document.querySelectorAll("#sample-phone"),
+			{
+				mask: InputMaskDefaultMask.Phone, 
+				placeHolder: "Phone: (999) 999-9999"
+			});
 		}
 	</script>
 </head>
 <body onload="onLoad()">
 	<form action="" method="post">
   <fieldset>
-    <legend>Title</legend>
-    <input type="text" id="sample-ssnmask"> <label for="sample-ssnmask">SSN:</label>
-		</input>
-
+    <legend>input-mask.js Samples</legend>
+    
+		<div>
+			<label for="sample-ssnmask">SSN:</label>
+			<input type="text" id="sample-ssnmask"></input>
+		</div>
+    
+		<div>
+			<label for="sample-date">Date:</label>
+			<input type="text" id="sample-date"></input>
+		</div>
+    
+		<div>
+			<label for="sample-phone">Phone:</label>
+			<input type="text" id="sample-phone"></input>
+		</div>
   </fieldset>	
 	</form>
 
